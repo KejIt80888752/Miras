@@ -7,6 +7,8 @@ import History from './pages/History'
 import Parties from './pages/Parties'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
+import Login from './pages/Login'
+import { ROLES } from './auth'
 
 const ICONS = {
   dashboard: 'M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z',
@@ -19,75 +21,78 @@ const ICONS = {
 }
 
 const PAGES = [
-  ['dashboard', 'Dashboard', Dashboard, 'Overview'],
-  ['products', 'Products & Stock', Products, 'Inventory'],
-  ['billing', 'Sale / Purchase', Billing, 'Sales'],
-  ['history', 'Bills History', History],
-  ['parties', 'Customers & Suppliers', Parties],
-  ['reports', 'Reports', Reports, 'Insights'],
-  ['settings', 'Settings', Settings],
+  ['dashboard', 'Dashboard', Dashboard, 'dashboard'],
+  ['inventory', 'Products & Stock', Products, 'products'],
+  ['billing', 'Sale / Purchase', Billing, 'billing'],
+  ['bills', 'Bills History', History, 'history'],
+  ['customers', 'Customers & Suppliers', Parties, 'parties'],
+  ['reports', 'Reports', Reports, 'reports'],
+  ['settings', 'Settings', Settings, 'settings'],
 ]
 
 const LOGO = import.meta.env.BASE_URL + 'the-raise-logo.png'
-const Powered = ({ className }) => (
-  <div className={className}>
-    <div className="pl">POWERED BY</div>
-    <img src={LOGO} alt="The Raise" />
-    <div className="co">KEJ IT Solutions</div>
-  </div>
-)
 
-const getPage = () => { const h = location.hash.slice(1); return PAGES.some((p) => p[0] === h) ? h : 'dashboard' }
-
-function toggleTheme() {
-  const root = document.documentElement
-  const cur = root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-  const next = cur === 'dark' ? 'light' : 'dark'
-  root.dataset.theme = next
-  try { localStorage.setItem('miras_theme', next) } catch (e) { /* ignore */ }
-}
-try { const t = localStorage.getItem('miras_theme'); if (t) document.documentElement.dataset.theme = t } catch (e) { /* ignore */ }
+const route = () => location.hash.replace(/^#\/?/, '').split('?')[0] || 'dashboard'
 
 export default function App() {
-  const { db } = useStore()
-  const [page, setPage] = useState(getPage)
+  const { db, user, logout } = useStore()
+  const [page, setPage] = useState(route)
   useEffect(() => {
-    const on = () => { setPage(getPage()); window.scrollTo(0, 0) }
+    const on = () => { setPage(route()); window.scrollTo(0, 0) }
     window.addEventListener('hashchange', on)
     return () => window.removeEventListener('hashchange', on)
   }, [])
-  const Page = PAGES.find((p) => p[0] === page)[2]
+
+  const allowed = user ? ROLES[user.role] || ROLES.Sales : []
+  // redirect rules: not logged in -> login, logged in on login/unknown page -> dashboard
+  useEffect(() => {
+    if (!user && page !== 'login') location.replace('#/login')
+    else if (user && (page === 'login' || !allowed.includes(page))) location.replace('#/dashboard')
+  }, [user, page]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!user) return <Login />
+  const cur = PAGES.find((p) => p[0] === page && allowed.includes(p[0])) || PAGES[0]
+  const Page = cur[2]
+  const initials = user.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
 
   return (
     <div className="app">
       <aside>
-        <a className="brand" href="#dashboard" style={{ textDecoration: 'none' }}>
+        <a className="brand" href="#/dashboard">
           <div className="emblem">M</div>
           <div><b>{db.settings.bizName || 'Miras Carpets'}</b><small>Carpets · Shawls · Jewels</small></div>
         </a>
         <nav>
-          {PAGES.map(([k, l, , group]) => (
-            <div key={k} style={{ display: 'contents' }}>
-              {group && <div className="nav-label">{group}</div>}
-              <a href={'#' + k} className={k === page ? 'active' : ''} title={l}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={ICONS[k]} /></svg>
-                <span>{l}</span>
-              </a>
-            </div>
+          {PAGES.filter((p) => allowed.includes(p[0])).map(([k, l, , ic]) => (
+            <a key={k} href={'#/' + k} className={k === cur[0] ? 'active' : ''} title={l}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={ICONS[ic]} /></svg>
+              <span>{l}</span>
+            </a>
           ))}
         </nav>
         <div className="side-foot">
           <div className="side-user">
-            <div className="avatar">A</div>
-            <div><b>Admin</b><span>{db.settings.bizName}</span></div>
-            <button className="btn sm icon theme-btn" onClick={toggleTheme} title="Light / Dark theme">◐</button>
+            <div className="avatar">{initials}</div>
+            <div><b>{user.name}</b><span>{user.role}</span></div>
           </div>
-          <Powered className="powered" />
+          <button className="signout" onClick={logout}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg>
+            <span>Sign Out</span>
+          </button>
+          <div className="powered">
+            <div className="pl">POWERED BY</div>
+            <img src={LOGO} alt="The Raise" />
+            <div className="co">KEJ IT Solutions</div>
+          </div>
         </div>
       </aside>
       <main>
-        <Page key={page} />
-        <Powered className="powered-mobile" />
+        <Page key={cur[0]} />
+        <div className="powered-mobile">
+          <div className="pl">POWERED BY</div>
+          <img src={LOGO} alt="The Raise" />
+          <div className="co">KEJ IT Solutions</div>
+        </div>
       </main>
     </div>
   )

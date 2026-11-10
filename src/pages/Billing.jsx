@@ -62,7 +62,7 @@ export default function Billing() {
         <Seg value={bill.type} options={[['out', 'Sale'], ['in', 'Purchase']]} onChange={switchType} />
       </Head>
       {!db.products.length ? (
-        <div className="card empty">Mudhalla products add pannunga. <a href="#products">Products page →</a></div>
+        <div className="card empty">Mudhalla products add pannunga. <a href="#/inventory">Products page →</a></div>
       ) : (
         <div className="card">
           <div className="form" style={{ gridTemplateColumns: '2fr 1fr' }}>

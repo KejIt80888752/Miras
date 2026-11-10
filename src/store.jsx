@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { calcBill, daysAgo, lowLimit, makeMoney, uid } from './utils'
 import { detailText } from './catalog'
+import { DEFAULT_USERS, getSession, hashPassword, setSession } from './auth'
 
 const KEY = 'miras_db_v1'
+const UKEY = 'miras_users_v1'
 
 export function freshDb() {
   return {
-    settings: { bizName: 'Miras Carpets', address: '', phone: '', email: '', gstin: '', currency: '₹', lowStock: 5, defaultTax: 0, nextIn: 1, nextOut: 1 },
+    settings: { bizName: 'Miras Carpets', address: '', phone: '', email: '', gstin: '', currency: '₹', lowStock: 5, defaultTax: 0, nextIn: 1, nextOut: 1, showDemoLogins: true },
     products: [], parties: [], bills: [], adjustments: [],
   }
 }
@@ -86,12 +88,29 @@ export function StoreProvider({ children }) {
     setDb((prev) => { const draft = structuredClone(prev); const r = fn(draft); return r || draft })
   }, [])
 
+  // ---- users & login (kept apart from business data, so demo/reset never touches accounts)
+  const [users, setUsers] = useState(() => {
+    try { const u = JSON.parse(localStorage.getItem(UKEY)); if (Array.isArray(u) && u.length) return u } catch { /* ignore */ }
+    return DEFAULT_USERS
+  })
+  useEffect(() => { try { localStorage.setItem(UKEY, JSON.stringify(users)) } catch { /* ignore */ } }, [users])
+  const [sessionId, setSessionId] = useState(getSession)
+  const user = users.find((u) => u.id === sessionId) || null
+  const login = useCallback(async (email, pw) => {
+    const h = await hashPassword(pw)
+    const u = users.find((x) => x.email.toLowerCase() === email.trim().toLowerCase() && x.hash === h)
+    if (u) { setSession(u.id); setSessionId(u.id) }
+    return u
+  }, [users])
+  const logout = useCallback(() => { setSession(null); setSessionId(null) }, [])
+
   const value = useMemo(() => ({
     db, update, replace: setDb, toast,
     money: makeMoney(db.settings.currency),
     low: (p) => lowLimit(p, db.settings),
     prod: (id) => db.products.find((p) => p.id === id),
-  }), [db, update, toast])
+    users, setUsers, user, login, logout,
+  }), [db, update, toast, users, user, login, logout])
 
   return (
     <StoreCtx.Provider value={value}>

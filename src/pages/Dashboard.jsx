@@ -25,14 +25,14 @@ export default function Dashboard() {
   return (
     <>
       <Head title="Dashboard" sub={`${db.settings.bizName} · ${new Date().toLocaleDateString('en-IN', { dateStyle: 'full' })}`}>
-        <a className="btn" href="#products">+ Product</a>
-        <a className="btn primary" href="#billing">+ New Bill</a>
+        <a className="btn" href="#/inventory">+ Product</a>
+        <a className="btn primary" href="#/billing">+ New Bill</a>
       </Head>
       {empty && (
         <div className="card" style={{ marginBottom: 14 }}>
           <b>Welcome to Miras Carpets!</b> <span className="sub">Products add panni start pannunga, illa demo data load panni paarunga.</span>
           <div className="toolbar" style={{ margin: '10px 0 0' }}>
-            <a className="btn primary" href="#products">Add first product</a>
+            <a className="btn primary" href="#/inventory">Add first product</a>
             <button className="btn" onClick={() => { replace(sampleDb()); toast('Demo data loaded') }}>Load demo data</button>
           </div>
         </div>
@@ -49,7 +49,7 @@ export default function Dashboard() {
         {CATEGORY_NAMES.filter((c) => c !== 'Other' || db.products.some((p) => p.category === 'Other')).map((c) => {
           const ps = db.products.filter((p) => p.category === c)
           return (
-            <a key={c} href="#products" className="card kpi cat-card">
+            <a key={c} href="#/inventory" className="card kpi cat-card">
               <div className="ic c2"><span className="emo" style={{ fontSize: 20 }}>{CATALOG[c].icon}</span></div>
               <div className="l">{c}</div>
               <div className="v">{qtyFmt(ps.reduce((s, p) => s + num(p.qty), 0))} <span className="sub" style={{ fontSize: 13, fontWeight: 400 }}>in stock · {ps.length} items</span></div>

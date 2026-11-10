@@ -2,6 +2,62 @@ import { useRef, useState } from 'react'
 import { freshDb, normalize, sampleDb, useStore } from '../store'
 import { download, num, today } from '../utils'
 import { Field, Head, Modal } from '../components/ui'
+import { hashPassword, ROLES } from '../auth'
+import { uid } from '../utils'
+
+function UsersCard() {
+  const { db, update, users, setUsers, user, toast } = useStore()
+  const [edit, setEdit] = useState(null)
+  const [pw, setPw] = useState('')
+  const save = async () => {
+    const name = edit.name.trim(), email = edit.email.trim().toLowerCase()
+    if (!name || !email) return toast('Name and email venum', true)
+    if (users.some((u) => u.email.toLowerCase() === email && u.id !== edit.id)) return toast('Indha email already irukku', true)
+    if (!edit.id && pw.length < 6) return toast('Password minimum 6 characters', true)
+    if (pw && pw.length < 6) return toast('Password minimum 6 characters', true)
+    const hash = pw ? await hashPassword(pw) : undefined
+    setUsers((list) => edit.id
+      ? list.map((u) => (u.id === edit.id ? { ...u, name, email, role: u.id === user.id ? u.role : edit.role, ...(hash ? { hash } : {}) } : u))
+      : [...list, { id: uid(), name, email, role: edit.role, hash }])
+    toast(edit.id ? 'User updated' : 'User added')
+    setEdit(null); setPw('')
+  }
+  const remove = (u) => { if (u.id === user.id) return toast('Unga sondha account delete panna mudiyaadhu', true); setUsers((l) => l.filter((x) => x.id !== u.id)); toast('User removed') }
+
+  return (
+    <div className="card" style={{ maxWidth: 720, marginTop: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <h2 style={{ margin: 0 }}>Users &amp; Login</h2>
+        <button className="btn sm primary" onClick={() => { setEdit({ name: '', email: '', role: 'Sales' }); setPw('') }}>+ Add User</button>
+      </div>
+      <div className="tw"><table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+        <tbody>{users.map((u) => (
+          <tr key={u.id}><td><b>{u.name}</b>{u.id === user.id && <span className="badge b-in" style={{ marginLeft: 6 }}>You</span>}</td><td>{u.email}</td><td>{u.role}</td>
+            <td><button className="btn sm" onClick={() => { setEdit({ ...u }); setPw('') }}>Edit</button> <button className="btn sm danger" onClick={() => remove(u)}>Remove</button></td></tr>
+        ))}</tbody>
+      </table></div>
+      <label style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14 }}>
+        <input type="checkbox" checked={db.settings.showDemoLogins !== false} onChange={(e) => update((d) => { d.settings.showDemoLogins = e.target.checked })} />
+        Login page la demo credentials kaattu (client ku kudukkum munnaadi off pannunga)
+      </label>
+      {edit && (
+        <Modal title={edit.id ? 'Edit User' : 'Add User'} onClose={() => setEdit(null)}
+          footer={<><button className="btn" onClick={() => setEdit(null)}>Cancel</button><button className="btn primary" onClick={save}>Save</button></>}>
+          <div className="form">
+            <Field label="Name" full><input autoFocus value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></Field>
+            <Field label="Email (login ID)" full><input type="email" value={edit.email} onChange={(e) => setEdit({ ...edit, email: e.target.value })} /></Field>
+            <Field label="Role">
+              <select value={edit.role} disabled={edit.id === user.id} onChange={(e) => setEdit({ ...edit, role: e.target.value })}>{Object.keys(ROLES).map((r) => <option key={r}>{r}</option>)}</select>
+            </Field>
+            <Field label={edit.id ? 'New password (blank = no change)' : 'Password'}><input type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
+          </div>
+          <p className="sub" style={{ fontSize: 12, marginBottom: 0 }}>Admin: ellaam · Manager: Settings thavira ellaam · Sales: Dashboard, Products, Billing, Bills, Customers</p>
+        </Modal>
+      )}
+    </div>
+  )
+}
 
 export default function Settings() {
   const { db, update, replace, toast } = useStore()
@@ -70,6 +126,7 @@ export default function Settings() {
         </div>
         <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={onFile} />
       </div>
+      <UsersCard />
       {confirm && (
         <Modal title={confirm.title} onClose={() => { setConfirm(null); setTyped('') }}
           footer={<><button className="btn" onClick={() => { setConfirm(null); setTyped('') }}>Cancel</button>
