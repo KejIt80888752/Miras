@@ -14,7 +14,7 @@ export default function Settings() {
   const save = () => {
     update((d) => {
       Object.assign(d.settings, {
-        bizName: f.bizName.trim() || 'Miras', address: f.address.trim(), phone: f.phone.trim(), email: f.email.trim(),
+        bizName: f.bizName.trim() || 'Miras Carpets', address: f.address.trim(), phone: f.phone.trim(), email: f.email.trim(),
         gstin: f.gstin.trim(), currency: f.currency.trim(), lowStock: num(f.lowStock), defaultTax: num(f.defaultTax),
       })
     })

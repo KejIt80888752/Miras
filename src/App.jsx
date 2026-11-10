@@ -52,7 +52,7 @@ export default function App() {
   return (
     <div className="app">
       <aside>
-        <div className="brand"><div className="logo">M</div><div><b>Miras</b><small>Inventory Manager</small></div></div>
+        <div className="brand"><div className="logo">M</div><div><b>Miras Carpets</b><small>Carpets · Shawls · Jewels</small></div></div>
         <nav>
           {PAGES.map(([k, l]) => (
             <a key={k} href={'#' + k} className={k === page ? 'active' : ''} title={l}>

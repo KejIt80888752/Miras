@@ -16,7 +16,7 @@ export default function Reports() {
     const ratio = b.sub ? (b.sub - b.discount) / b.sub : 1
     b.items.forEach((l) => {
       const p = prod(l.pid)
-      const a = agg[l.pid] || (agg[l.pid] = { name: l.name, qty: 0, rev: 0, cost: 0 })
+      const a = agg[l.pid] || (agg[l.pid] = { name: l.name, cat: p ? p.category : '', qty: 0, rev: 0, cost: 0 })
       a.qty += l.qty; a.rev += l.qty * l.rate * ratio; a.cost += l.qty * (p ? num(p.cost) : 0)
     })
   })
@@ -43,9 +43,9 @@ export default function Reports() {
         <p className="sub" style={{ margin: '-6px 0 10px' }}>Profit = sales (discount kazhichu, tax illama) − current cost price</p>
         {rows.length ? (
           <div className="tw"><table>
-            <thead><tr><th>Product</th><th className="n">Qty sold</th><th className="n">Sales</th><th className="n">Cost</th><th className="n">Profit</th></tr></thead>
+            <thead><tr><th>Product</th><th>Category</th><th className="n">Qty sold</th><th className="n">Sales</th><th className="n">Cost</th><th className="n">Profit</th></tr></thead>
             <tbody>{rows.map((r) => (
-              <tr key={r.name}><td>{r.name}</td><td className="n">{qtyFmt(r.qty)}</td><td className="n">{money(r.rev)}</td><td className="n">{money(r.cost)}</td><td className="n"><b>{money(r.rev - r.cost)}</b></td></tr>
+              <tr key={r.name}><td>{r.name}</td><td>{r.cat}</td><td className="n">{qtyFmt(r.qty)}</td><td className="n">{money(r.rev)}</td><td className="n">{money(r.cost)}</td><td className="n"><b>{money(r.rev - r.cost)}</b></td></tr>
             ))}</tbody>
           </table></div>
         ) : <div className="empty">Indha period la sales illa</div>}

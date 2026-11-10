@@ -4,6 +4,7 @@ import { daysAgo, num, qtyFmt, today } from '../utils'
 import { Head, StockBadge } from '../components/ui'
 import { BillTable } from './History'
 import { InvoiceModal } from '../components/Invoice'
+import { CATALOG, CATEGORY_NAMES } from '../catalog'
 
 export default function Dashboard() {
   const { db, money, low, replace, toast } = useStore()
@@ -29,7 +30,7 @@ export default function Dashboard() {
       </Head>
       {empty && (
         <div className="card" style={{ marginBottom: 14 }}>
-          <b>Welcome to Miras!</b> <span className="sub">Products add panni start pannunga, illa demo data load panni paarunga.</span>
+          <b>Welcome to Miras Carpets!</b> <span className="sub">Products add panni start pannunga, illa demo data load panni paarunga.</span>
           <div className="toolbar" style={{ margin: '10px 0 0' }}>
             <a className="btn primary" href="#products">Add first product</a>
             <button className="btn" onClick={() => { replace(sampleDb()); toast('Demo data loaded') }}>Load demo data</button>
@@ -43,6 +44,18 @@ export default function Dashboard() {
         <Kpi l="Today's Sales" v={money(sum('out', (b) => b.date === today()))} />
         <Kpi l="Sales this month" v={money(sum('out', (b) => b.date.startsWith(mon)))} />
         <Kpi l="Purchases this month" v={money(sum('in', (b) => b.date.startsWith(mon)))} />
+      </div>
+      <div className="grid kpis" style={{ marginTop: 14 }}>
+        {CATEGORY_NAMES.filter((c) => c !== 'Other' || db.products.some((p) => p.category === 'Other')).map((c) => {
+          const ps = db.products.filter((p) => p.category === c)
+          return (
+            <a key={c} href="#products" className="card kpi" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <div className="l">{CATALOG[c].icon} {c}</div>
+              <div className="v">{qtyFmt(ps.reduce((s, p) => s + num(p.qty), 0))} <span className="sub" style={{ fontSize: 13, fontWeight: 400 }}>in stock · {ps.length} items</span></div>
+              <div className="sub" style={{ fontSize: 12 }}>Value {money(ps.reduce((s, p) => s + num(p.qty) * num(p.cost), 0))}</div>
+            </a>
+          )
+        })}
       </div>
       <div className="grid two">
         <div className="card">
@@ -63,7 +76,7 @@ export default function Dashboard() {
             <div className="tw"><table><tbody>
               <tr><th>Product</th><th className="n">Qty</th><th></th></tr>
               {lowList.slice(0, 8).map((p) => (
-                <tr key={p.id}><td>{p.name}</td><td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td></tr>
+                <tr key={p.id}><td>{CATALOG[p.category]?.icon} {p.name}</td><td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td></tr>
               ))}
             </tbody></table></div>
           ) : <div className="empty">Ellaa products-um stock la irukku 👍</div>}

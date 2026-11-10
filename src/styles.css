@@ -133,3 +133,4 @@ label input,label select,label textarea{color:var(--text)}
 
 .btn:disabled{opacity:.5;cursor:not-allowed}
 #root{min-height:100vh}
+.seg{flex-wrap:wrap;max-width:100%}

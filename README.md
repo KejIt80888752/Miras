@@ -1,6 +1,6 @@
-# Miras — Inventory Manager
+# Miras Carpets — Inventory Manager
 
-React + Vite inventory software: products & stock, sales / purchase billing with printable invoices, bills history, customers & suppliers, reports (sales, purchase, profit, tax), low-stock alerts, CSV export and JSON backup/restore.
+React + Vite inventory software for Miras Carpets (Carpets, Shawls, Jewels): products & stock, sales / purchase billing with printable invoices, bills history, customers & suppliers, reports (sales, purchase, profit, tax), low-stock alerts, CSV export and JSON backup/restore.
 
 Live: https://kejit80888752.github.io/Miras/
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useStore } from '../store'
 import { calcBill, num, qtyFmt, r2, today, uid } from '../utils'
 import { Field, Head, Seg } from '../components/ui'
+import { CATEGORY_NAMES, detailText } from '../catalog'
 import { InvoiceModal } from '../components/Invoice'
 
 const blankItem = () => ({ key: uid(), pid: '', qty: 1, rate: 0 })
@@ -43,7 +44,7 @@ export default function Billing() {
       const ptype = isOut ? 'customer' : 'supplier'
       let party = d.parties.find((p) => p.type === ptype && p.name.toLowerCase() === partyName.toLowerCase())
       if (!party && bill.party.trim()) { party = { id: uid(), type: ptype, name: partyName, phone: '', address: '' }; d.parties.push(party) }
-      const lines = items.map((it) => { const p = d.products.find((x) => x.id === it.pid); return { pid: it.pid, name: p.name, unit: p.unit, qty: r2(num(it.qty)), rate: num(it.rate) } })
+      const lines = items.map((it) => { const p = d.products.find((x) => x.id === it.pid); return { pid: it.pid, name: p.name, desc: detailText(p), unit: p.unit, qty: r2(num(it.qty)), rate: num(it.rate) } })
       lines.forEach((l) => { const p = d.products.find((x) => x.id === l.pid); p.qty = r2(num(p.qty) + (isOut ? -l.qty : l.qty)); if (!isOut && l.rate > 0) p.cost = l.rate })
       const c = calcBill({ items: lines, discount: bill.discount, tax: bill.tax })
       var created = { id: uid(), no, type: bill.type, date: bill.date, partyId: party ? party.id : '', partyName, items: lines, discount: num(bill.discount), tax: num(bill.tax), sub: c.sub, taxAmt: c.taxAmt, total: c.total, note: bill.note.trim(), created: Date.now() }
@@ -82,8 +83,16 @@ export default function Billing() {
                       <td>
                         <select value={it.pid} onChange={(e) => pick(i, e.target.value)}>
                           <option value="">— Select product —</option>
-                          {opts.map((o) => <option key={o.id} value={o.id}>{o.name}{o.sku ? ` (${o.sku})` : ''}</option>)}
+                          {CATEGORY_NAMES.map((c) => {
+                            const group = opts.filter((o) => (CATEGORY_NAMES.includes(o.category) ? o.category : 'Other') === c)
+                            return group.length ? (
+                              <optgroup key={c} label={c}>
+                                {group.map((o) => <option key={o.id} value={o.id}>{o.name}{o.sku ? ` (${o.sku})` : ''}</option>)}
+                              </optgroup>
+                            ) : null
+                          })}
                         </select>
+                        {p && detailText(p) && <div className="sub" style={{ fontSize: 12, marginTop: 2 }}>{detailText(p)}</div>}
                       </td>
                       <td className="n">{p ? `${qtyFmt(p.qty)} ${p.unit}` : '—'}</td>
                       <td><input className="q" type="number" step="any" min="0" value={it.qty} onChange={(e) => setItem(i, { qty: e.target.value })} /></td>
