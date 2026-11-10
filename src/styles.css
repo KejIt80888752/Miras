@@ -227,3 +227,6 @@ label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--text
   .kpi .v{font-size:22px}
   .powered-mobile{display:block;text-align:center;padding:18px 16px 26px;border-top:1px solid var(--line);margin-top:20px}
 }
+.cat-name{display:inline-flex;align-items:center;gap:7px}
+.btn .icon{width:16px;height:16px}
+.login-contact div{display:flex;align-items:center;gap:7px}

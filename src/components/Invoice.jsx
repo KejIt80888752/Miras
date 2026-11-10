@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useStore } from '../store'
 import { fmtDate, qtyFmt } from '../utils'
 import { Modal } from './ui'
+import Icon from './Icon'
 
 export function Invoice({ b }) {
   const { db, money } = useStore()
@@ -68,7 +69,7 @@ export function InvoiceModal({ bill, onClose }) {
   return (
     <>
       <Modal title={bill.no} onClose={onClose} wide
-        footer={<><button className="btn" onClick={onClose}>Close</button><button className="btn primary" onClick={print}>🖨 Print</button></>}>
+        footer={<><button className="btn" onClick={onClose}>Close</button><button className="btn primary" onClick={print}><Icon name="printer" /> Print</button></>}>
         <Invoice b={bill} />
       </Modal>
       {printing && createPortal(<div id="printArea"><Invoice b={bill} /></div>, document.body)}

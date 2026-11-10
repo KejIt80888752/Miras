@@ -4,6 +4,7 @@ import { calcBill, num, qtyFmt, r2, today, uid } from '../utils'
 import { Field, Head, Seg } from '../components/ui'
 import { CATEGORY_NAMES, detailText } from '../catalog'
 import { InvoiceModal } from '../components/Invoice'
+import Icon from '../components/Icon'
 
 const blankItem = () => ({ key: uid(), pid: '', qty: 1, rate: 0 })
 const newBill = (type, tax) => ({ type, date: today(), party: '', items: [blankItem()], discount: 0, tax: num(tax), note: '' })
@@ -98,7 +99,7 @@ export default function Billing() {
                       <td><input className="q" type="number" step="any" min="0" value={it.qty} onChange={(e) => setItem(i, { qty: e.target.value })} /></td>
                       <td><input className="r" type="number" step="any" min="0" value={it.rate} onChange={(e) => setItem(i, { rate: e.target.value })} /></td>
                       <td className="n">{money(num(it.qty) * num(it.rate))}</td>
-                      <td><button className="btn icon danger" onClick={() => removeItem(i)} title="Remove">✕</button></td>
+                      <td><button className="btn icon danger" onClick={() => removeItem(i)} title="Remove"><Icon name="x" /></button></td>
                     </tr>
                   )
                 })}

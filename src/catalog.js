@@ -1,7 +1,7 @@
 // Miras Carpets — product categories and the extra details each one needs
 export const CATALOG = {
   Carpets: {
-    icon: '🧶',
+    icon: 'carpet',
     units: ['pcs', 'sqft', 'sqm'],
     fields: [
       { k: 'size', l: 'Size (L × W)', ph: 'eg. 6 × 9 ft' },
@@ -12,7 +12,7 @@ export const CATALOG = {
     ],
   },
   Shawls: {
-    icon: '🧣',
+    icon: 'shawl',
     units: ['pcs'],
     fields: [
       { k: 'material', l: 'Material', list: ['Pashmina', 'Cashmere', 'Wool', 'Silk', 'Wool & Silk', 'Cotton'] },
@@ -22,7 +22,7 @@ export const CATALOG = {
     ],
   },
   Jewels: {
-    icon: '💍',
+    icon: 'gem',
     units: ['pcs', 'g', 'set', 'pair'],
     fields: [
       { k: 'metal', l: 'Metal', list: ['Gold', 'Silver', 'Platinum', 'Oxidised Silver', 'Brass', 'Imitation'] },
@@ -32,7 +32,7 @@ export const CATALOG = {
       { k: 'type', l: 'Type', list: ['Necklace', 'Earrings', 'Bangle', 'Ring', 'Pendant', 'Bracelet', 'Anklet', 'Set'] },
     ],
   },
-  Other: { icon: '📦', units: ['pcs', 'kg', 'box', 'set'], fields: [] },
+  Other: { icon: 'box', units: ['pcs', 'kg', 'box', 'set'], fields: [] },
 }
 
 export const CATEGORY_NAMES = Object.keys(CATALOG)

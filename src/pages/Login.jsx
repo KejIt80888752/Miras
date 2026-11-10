@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../store'
 import { DEMO_PASSWORDS, DEFAULT_USERS } from '../auth'
+import Icon from '../components/Icon'
 
 const LOGO = import.meta.env.BASE_URL + 'the-raise-logo.png'
 
@@ -41,8 +42,8 @@ export default function Login() {
           </div>
           {(s.address || s.phone) && (
             <div className="login-contact">
-              {s.address && <div>📍 {s.address}</div>}
-              {s.phone && <div>📞 {s.phone}</div>}
+              {s.address && <div><Icon name="pin" size={14} /> {s.address}</div>}
+              {s.phone && <div><Icon name="phone" size={14} /> {s.phone}</div>}
             </div>
           )}
           <div className="login-powered">

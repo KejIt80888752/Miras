@@ -5,6 +5,7 @@ import { Head, StockBadge } from '../components/ui'
 import { BillTable } from './History'
 import { InvoiceModal } from '../components/Invoice'
 import { CATALOG, CATEGORY_NAMES } from '../catalog'
+import Icon from '../components/Icon'
 
 export default function Dashboard() {
   const { db, money, low, replace, toast } = useStore()
@@ -50,7 +51,7 @@ export default function Dashboard() {
           const ps = db.products.filter((p) => p.category === c)
           return (
             <a key={c} href="#/inventory" className="card kpi cat-card">
-              <div className="ic c2"><span className="emo" style={{ fontSize: 20 }}>{CATALOG[c].icon}</span></div>
+              <div className="ic c2"><Icon name={CATALOG[c].icon} size={20} /></div>
               <div className="l">{c}</div>
               <div className="v">{qtyFmt(ps.reduce((s, p) => s + num(p.qty), 0))} <span className="sub" style={{ fontSize: 13, fontWeight: 400 }}>in stock · {ps.length} items</span></div>
               <div className="sub" style={{ fontSize: 12 }}>Value {money(ps.reduce((s, p) => s + num(p.qty) * num(p.cost), 0))}</div>
@@ -77,10 +78,10 @@ export default function Dashboard() {
             <div className="tw"><table><tbody>
               <tr><th>Product</th><th className="n">Qty</th><th></th></tr>
               {lowList.slice(0, 8).map((p) => (
-                <tr key={p.id}><td>{CATALOG[p.category]?.icon} {p.name}</td><td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td></tr>
+                <tr key={p.id}><td><span className="cat-name"><Icon name={(CATALOG[p.category] || CATALOG.Other).icon} style={{ color: 'var(--muted)' }} />{p.name}</span></td><td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td></tr>
               ))}
             </tbody></table></div>
-          ) : <div className="empty">Ellaa products-um stock la irukku 👍</div>}
+          ) : <div className="empty"><Icon name="check" size={22} style={{ color: 'var(--ok)', display: 'block', margin: '0 auto 6px' }} />Ellaa products-um stock la irukku</div>}
         </div>
       </div>
       <div className="card" style={{ marginTop: 14 }}>

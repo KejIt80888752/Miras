@@ -4,6 +4,7 @@ import { download, num, today } from '../utils'
 import { Field, Head, Modal } from '../components/ui'
 import { hashPassword, ROLES } from '../auth'
 import { uid } from '../utils'
+import Icon from '../components/Icon'
 
 function UsersCard() {
   const { db, update, users, setUsers, user, toast } = useStore()
@@ -119,8 +120,8 @@ export default function Settings() {
         <h2>Backup & data</h2>
         <p className="sub" style={{ marginTop: -6 }}>Data indha device browser la mattum save aagum. Weekly oru thadava backup download pannunga.</p>
         <div className="toolbar" style={{ marginTop: 10 }}>
-          <button className="btn primary" onClick={backup}>⬇ Download backup</button>
-          <button className="btn" onClick={() => fileRef.current.click()}>⬆ Restore backup</button>
+          <button className="btn primary" onClick={backup}><Icon name="download" /> Download backup</button>
+          <button className="btn" onClick={() => fileRef.current.click()}><Icon name="upload" /> Restore backup</button>
           <button className="btn" onClick={() => setConfirm({ title: 'Load demo data?', text: 'Demo data ippo irukkura data-vai replace pannum.', action: () => { const s = sampleDb(); replace(s); setF(s.settings); toast('Demo data loaded') } })}>Load demo data</button>
           <button className="btn danger" onClick={() => setConfirm({ title: 'Delete all data?', text: 'Ellaa products, bills, customers delete aagum. Thirumba kondu vara mudiyaadhu (backup illana).', typed: true, action: () => { const n = freshDb(); replace(n); setF(n.settings); toast('All data cleared') } })}>Delete all data</button>
         </div>

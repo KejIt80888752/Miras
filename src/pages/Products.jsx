@@ -3,6 +3,7 @@ import { useStore } from '../store'
 import { download, num, qtyFmt, r2, toCSV, today, uid } from '../utils'
 import { CATALOG, CATEGORY_NAMES, catOf, detailText } from '../catalog'
 import { Field, Head, Modal, Seg, StockBadge } from '../components/ui'
+import Icon from '../components/Icon'
 
 export default function Products() {
   const { db, money, low } = useStore()
@@ -21,7 +22,7 @@ export default function Products() {
     .sort((a, b) => a.name.localeCompare(b.name))
   const value = db.products.reduce((s, p) => s + num(p.qty) * num(p.cost), 0)
   const count = (c) => db.products.filter((p) => p.category === c).length
-  const tabs = [['', `All (${db.products.length})`], ...CATEGORY_NAMES.filter((c) => c !== 'Other' || count('Other')).map((c) => [c, `${CATALOG[c].icon} ${c} (${count(c)})`])]
+  const tabs = [['', `All (${db.products.length})`], ...CATEGORY_NAMES.filter((c) => c !== 'Other' || count('Other')).map((c) => [c, <span className="cat-name" key={c}><Icon name={CATALOG[c].icon} />{c} ({count(c)})</span>])]
 
   const exportCsv = () => {
     const rows = [['SKU', 'Name', 'Category', 'Details', 'Unit', 'Qty', 'Cost', 'Price', 'Stock Value', 'Low Stock Level']]
@@ -52,7 +53,7 @@ export default function Products() {
               <tr key={p.id}>
                 <td>{p.sku || <span className="sub">—</span>}</td>
                 <td><b>{p.name}</b>{detailText(p) && <div className="sub" style={{ fontSize: 12 }}>{detailText(p)}</div>}</td>
-                <td>{catOf(p).icon} {p.category}</td>
+                <td><span className="cat-name"><Icon name={catOf(p).icon} style={{ color: 'var(--muted)' }} />{p.category}</span></td>
                 <td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td>
                 <td className="n">{money(p.cost)}</td><td className="n">{money(p.price)}</td><td className="n">{money(num(p.qty) * num(p.cost))}</td>
                 <td>
@@ -106,7 +107,7 @@ function ProductForm({ p, onClose }) {
       footer={<><button className="btn" onClick={onClose}>Cancel</button><button className="btn primary" onClick={save}>Save</button></>}>
       <div className="form">
         <Field label="Category">
-          <select value={f.category} onChange={changeCat}>{CATEGORY_NAMES.map((c) => <option key={c} value={c}>{CATALOG[c].icon} {c}</option>)}</select>
+          <select value={f.category} onChange={changeCat}>{CATEGORY_NAMES.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         </Field>
         <Field label="Code / SKU"><input value={f.sku} onChange={set('sku')} placeholder="Optional" /></Field>
         <Field label="Product name *" full><input autoFocus value={f.name} onChange={set('name')} placeholder={f.category === 'Carpets' ? 'eg. Kashmiri Silk Carpet' : f.category === 'Shawls' ? 'eg. Pashmina Sozni Shawl' : f.category === 'Jewels' ? 'eg. Kundan Necklace' : ''} /></Field>
