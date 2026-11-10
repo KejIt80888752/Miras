@@ -37,7 +37,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-      <div className="grid kpis">
+      <div className="grid kpis k3">
         <Kpi l="Total Products" v={db.products.length} ic="box" c="c1" />
         <Kpi l="Stock Value (cost)" v={money(stockVal)} ic="value" c="c2" />
         <Kpi l="Low / Out of Stock" v={lowList.length} warn={lowList.length > 0} ic="alert" c="c3" />
@@ -45,7 +45,7 @@ export default function Dashboard() {
         <Kpi l="Sales this month" v={money(sum('out', (b) => b.date.startsWith(mon)))} ic="up" c="c1" />
         <Kpi l="Purchases this month" v={money(sum('in', (b) => b.date.startsWith(mon)))} ic="cart" c="c5" />
       </div>
-      <div className="grid kpis" style={{ marginTop: 14 }}>
+      <div className="grid kpis k3" style={{ marginTop: 16 }}>
         {CATEGORY_NAMES.filter((c) => c !== 'Other' || db.products.some((p) => p.category === 'Other')).map((c) => {
           const ps = db.products.filter((p) => p.category === c)
           return (
