@@ -44,7 +44,7 @@ export default function Products() {
         </select>
       </div>
       {!list.length ? (
-        <div className="card empty">{db.products.length ? 'Match aagura product illa' : <>Innum products illa. <b>+ Add Product</b> click pannunga.</>}</div>
+        <div className="card empty">{db.products.length ? 'No products match your search' : <>No products yet. Click <b>+ Add Product</b> to get started.</>}</div>
       ) : (
         <div className="tw"><table>
           <thead><tr><th>Code</th><th>Product</th><th>Category</th><th className="n">Qty</th><th>Status</th><th className="n">Cost</th><th className="n">Price</th><th className="n">Value</th><th></th></tr></thead>
@@ -89,8 +89,8 @@ function ProductForm({ p, onClose }) {
 
   const save = () => {
     const name = f.name.trim(), sku = String(f.sku).trim()
-    if (!name) return toast('Product name venum', true)
-    if (sku && db.products.some((x) => x.sku.toLowerCase() === sku.toLowerCase() && x.id !== p.id)) return toast('Indha code already irukku', true)
+    if (!name) return toast('Product name is required', true)
+    if (sku && db.products.some((x) => x.sku.toLowerCase() === sku.toLowerCase() && x.id !== p.id)) return toast('This code is already in use', true)
     const attrs = {}
     cat.fields.forEach((fl) => { const v = String(f.attrs[fl.k] || '').trim(); if (v) attrs[fl.k] = v })
     const data = { name, sku, category: f.category, attrs, unit: f.unit, qty: r2(num(f.qty)), cost: num(f.cost), price: num(f.price), reorder: f.reorder === '' ? '' : num(f.reorder) }
@@ -133,10 +133,10 @@ function AdjustForm({ p, onClose }) {
   const [qty, setQty] = useState('')
   const [note, setNote] = useState('')
   const apply = () => {
-    if (qty === '') return toast('Quantity type pannunga', true)
+    if (qty === '') return toast('Please enter a quantity', true)
     const before = num(p.qty), q = num(qty)
     const after = r2(type === 'add' ? before + q : type === 'sub' ? before - q : q)
-    if (after < 0) return toast('Stock minus la poga koodathu', true)
+    if (after < 0) return toast('Stock cannot go below zero', true)
     update((d) => {
       d.products.find((x) => x.id === p.id).qty = after
       d.adjustments.push({ id: uid(), pid: p.id, name: p.name, before, after, note: note.trim(), date: today(), created: Date.now() })
@@ -147,7 +147,7 @@ function AdjustForm({ p, onClose }) {
   return (
     <Modal title={'Stock Adjustment — ' + p.name} onClose={onClose}
       footer={<><button className="btn" onClick={onClose}>Cancel</button><button className="btn primary" onClick={apply}>Apply</button></>}>
-      <p className="sub" style={{ marginTop: 0 }}>Current stock: <b>{qtyFmt(p.qty)} {p.unit}</b>. Damage, return, count correction maadhiri changes ku use pannunga.</p>
+      <p className="sub" style={{ marginTop: 0 }}>Current stock: <b>{qtyFmt(p.qty)} {p.unit}</b>. Use this for damages, returns or stock count corrections.</p>
       <div className="form">
         <Field label="Type"><select value={type} onChange={(e) => setType(e.target.value)}><option value="add">Add (+)</option><option value="sub">Remove (−)</option><option value="set">Set exact qty</option></select></Field>
         <Field label="Quantity"><input autoFocus type="number" step="any" min="0" value={qty} onChange={(e) => setQty(e.target.value)} /></Field>
@@ -163,7 +163,7 @@ function DeleteProduct({ p, onClose }) {
   return (
     <Modal title="Delete product?" onClose={onClose}
       footer={<><button className="btn" onClick={onClose}>Cancel</button><button className="btn primary" onClick={go}>Delete</button></>}>
-      <p style={{ margin: 0 }}><b>{p.name}</b> delete aagum. Old bills la indha name apdiye irukkum.</p>
+      <p style={{ margin: 0 }}><b>{p.name}</b> will be deleted. Existing bills will keep this product name.</p>
     </Modal>
   )
 }

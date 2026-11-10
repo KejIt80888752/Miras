@@ -59,7 +59,7 @@ export default function History() {
 
   return (
     <>
-      <Head title="Bills History" sub="Ellaa sales & purchases"><button className="btn" onClick={exportCsv}>Export CSV</button></Head>
+      <Head title="Bills History" sub="All sales and purchases"><button className="btn" onClick={exportCsv}>Export CSV</button></Head>
       <div className="toolbar">
         <input type="search" placeholder="Bill no / party name…" value={q} onChange={(e) => setQ(e.target.value)} />
         <select value={type} onChange={(e) => setType(e.target.value)}><option value="">All</option><option value="out">Sales</option><option value="in">Purchases</option></select>
@@ -67,12 +67,12 @@ export default function History() {
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} title="To" />
       </div>
       <p className="sub" style={{ margin: '0 0 10px' }}>{list.length} bills · Sales <b>{money(sales)}</b> · Purchases <b>{money(purch)}</b></p>
-      {list.length ? <BillTable list={list} onView={setView} onDelete={setDel} /> : <div className="card empty">Bills illa</div>}
+      {list.length ? <BillTable list={list} onView={setView} onDelete={setDel} /> : <div className="card empty">No bills found</div>}
       {view && <InvoiceModal bill={view} onClose={() => setView(null)} />}
       {del && (
         <Modal title="Delete bill?" onClose={() => setDel(null)}
           footer={<><button className="btn" onClick={() => setDel(null)}>Cancel</button><button className="btn primary" onClick={doDelete}>Delete</button></>}>
-          <p style={{ margin: 0 }}><b>{del.no}</b> delete aagum. Stock thirumba {del.type === 'out' ? 'add' : 'kurai'} aagum.</p>
+          <p style={{ margin: 0 }}><b>{del.no}</b> will be deleted and its stock will be {del.type === 'out' ? 'added back' : 'reduced'}.</p>
         </Modal>
       )}
     </>

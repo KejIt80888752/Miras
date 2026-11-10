@@ -74,7 +74,7 @@ export function StoreProvider({ children }) {
 
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify(db)) }
-    catch (e) { setToastMsg({ msg: 'Save aagala! Settings la backup download pannunga', err: true }) }
+    catch (e) { setToastMsg({ msg: 'Could not save data. Please download a backup from Settings.', err: true }) }
   }, [db])
 
   const toast = useCallback((msg, err = false) => {

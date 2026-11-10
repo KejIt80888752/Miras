@@ -13,7 +13,7 @@ export default function Parties() {
 
   return (
     <>
-      <Head title="Customers & Suppliers" sub="Bill podumbodhu pudhu name type panna auto-va inga save aagum">
+      <Head title="Customers & Suppliers" sub="New names entered on a bill are saved here automatically">
         <button className="btn primary" onClick={() => setEdit({ type: tab })}>+ Add {label}</button>
       </Head>
       <div className="toolbar"><Seg value={tab} options={[['customer', 'Customers'], ['supplier', 'Suppliers']]} onChange={setTab} /></div>
@@ -33,13 +33,13 @@ export default function Parties() {
             })}
           </tbody>
         </table></div>
-      ) : <div className="card empty">Innum yarum illa</div>}
+      ) : <div className="card empty">No records yet</div>}
       {edit && <PartyForm p={edit} label={label} onClose={() => setEdit(null)} />}
       {del && (
         <Modal title="Delete?" onClose={() => setDel(null)}
           footer={<><button className="btn" onClick={() => setDel(null)}>Cancel</button>
             <button className="btn primary" onClick={() => { update((d) => { d.parties = d.parties.filter((x) => x.id !== del.id) }); toast('Deleted'); setDel(null) }}>Delete</button></>}>
-          <p style={{ margin: 0 }}><b>{del.name}</b> delete aagum. Bills delete aagaadhu.</p>
+          <p style={{ margin: 0 }}><b>{del.name}</b> will be deleted. Their bills will not be affected.</p>
         </Modal>
       )}
     </>
@@ -52,7 +52,7 @@ function PartyForm({ p, label, onClose }) {
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
   const save = () => {
     const name = f.name.trim()
-    if (!name) return toast('Name venum', true)
+    if (!name) return toast('Name is required', true)
     const data = { name, phone: f.phone.trim(), address: f.address.trim() }
     update((d) => {
       if (p.id) {

@@ -12,8 +12,8 @@ function UsersCard() {
   const [pw, setPw] = useState('')
   const save = async () => {
     const name = edit.name.trim(), email = edit.email.trim().toLowerCase()
-    if (!name || !email) return toast('Name and email venum', true)
-    if (users.some((u) => u.email.toLowerCase() === email && u.id !== edit.id)) return toast('Indha email already irukku', true)
+    if (!name || !email) return toast('Name and email are required', true)
+    if (users.some((u) => u.email.toLowerCase() === email && u.id !== edit.id)) return toast('This email is already in use', true)
     if (!edit.id && pw.length < 6) return toast('Password minimum 6 characters', true)
     if (pw && pw.length < 6) return toast('Password minimum 6 characters', true)
     const hash = pw ? await hashPassword(pw) : undefined
@@ -23,7 +23,7 @@ function UsersCard() {
     toast(edit.id ? 'User updated' : 'User added')
     setEdit(null); setPw('')
   }
-  const remove = (u) => { if (u.id === user.id) return toast('Unga sondha account delete panna mudiyaadhu', true); setUsers((l) => l.filter((x) => x.id !== u.id)); toast('User removed') }
+  const remove = (u) => { if (u.id === user.id) return toast('You cannot remove your own account', true); setUsers((l) => l.filter((x) => x.id !== u.id)); toast('User removed') }
 
   return (
     <div className="card" style={{ maxWidth: 720, marginTop: 16 }}>
@@ -40,7 +40,7 @@ function UsersCard() {
       </table></div>
       <label style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 14 }}>
         <input type="checkbox" checked={db.settings.showDemoLogins !== false} onChange={(e) => update((d) => { d.settings.showDemoLogins = e.target.checked })} />
-        Login page la demo credentials kaattu (client ku kudukkum munnaadi off pannunga)
+        Show demo credentials on the login page
       </label>
       {edit && (
         <Modal title={edit.id ? 'Edit User' : 'Add User'} onClose={() => setEdit(null)}
@@ -53,7 +53,7 @@ function UsersCard() {
             </Field>
             <Field label={edit.id ? 'New password (blank = no change)' : 'Password'}><input type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
           </div>
-          <p className="sub" style={{ fontSize: 12, marginBottom: 0 }}>Admin: ellaam · Manager: Settings thavira ellaam · Sales: Dashboard, Products, Billing, Bills, Customers</p>
+          <p className="sub" style={{ fontSize: 12, marginBottom: 0 }}>Admin: full access · Manager: everything except Settings · Sales: Dashboard, Products, Billing, Bills, Customers</p>
         </Modal>
       )}
     </div>
@@ -89,8 +89,8 @@ export default function Settings() {
       try {
         const d = JSON.parse(rd.result)
         if (!d || !Array.isArray(d.products) || !Array.isArray(d.bills)) throw 0
-        setConfirm({ title: 'Restore backup?', text: `Backup la ${d.products.length} products, ${d.bills.length} bills irukku. Ippo irukkura data replace aagum.`, action: () => { const n = normalize(d); replace(n); setF(n.settings); toast('Restored') } })
-      } catch { toast('Idhu valid Miras backup file illa', true) }
+        setConfirm({ title: 'Restore backup?', text: `This backup has ${d.products.length} products and ${d.bills.length} bills. Your current data will be replaced.`, action: () => { const n = normalize(d); replace(n); setF(n.settings); toast('Restored') } })
+      } catch { toast('This is not a valid Miras backup file', true) }
     }
     rd.readAsText(file)
   }
@@ -99,7 +99,7 @@ export default function Settings() {
 
   return (
     <>
-      <Head title="Settings" sub="Business details invoice la varum" />
+      <Head title="Settings" sub="Business details shown on your invoices" />
       <div className="card" style={{ maxWidth: 720 }}>
         <h2>Business details</h2>
         <div className="form">
@@ -118,12 +118,12 @@ export default function Settings() {
       </div>
       <div className="card" style={{ maxWidth: 720, marginTop: 14 }}>
         <h2>Backup & data</h2>
-        <p className="sub" style={{ marginTop: -6 }}>Data indha device browser la mattum save aagum. Weekly oru thadava backup download pannunga.</p>
+        <p className="sub" style={{ marginTop: -6 }}>Data is saved in this browser on this device only. Download a backup every week.</p>
         <div className="toolbar" style={{ marginTop: 10 }}>
           <button className="btn primary" onClick={backup}><Icon name="download" /> Download backup</button>
           <button className="btn" onClick={() => fileRef.current.click()}><Icon name="upload" /> Restore backup</button>
-          <button className="btn" onClick={() => setConfirm({ title: 'Load demo data?', text: 'Demo data ippo irukkura data-vai replace pannum.', action: () => { const s = sampleDb(); replace(s); setF(s.settings); toast('Demo data loaded') } })}>Load demo data</button>
-          <button className="btn danger" onClick={() => setConfirm({ title: 'Delete all data?', text: 'Ellaa products, bills, customers delete aagum. Thirumba kondu vara mudiyaadhu (backup illana).', typed: true, action: () => { const n = freshDb(); replace(n); setF(n.settings); toast('All data cleared') } })}>Delete all data</button>
+          <button className="btn" onClick={() => setConfirm({ title: 'Load demo data?', text: 'Demo data will replace your current data.', action: () => { const s = sampleDb(); replace(s); setF(s.settings); toast('Demo data loaded') } })}>Load demo data</button>
+          <button className="btn danger" onClick={() => setConfirm({ title: 'Delete all data?', text: 'All products, bills and customers will be permanently deleted. This cannot be undone without a backup.', typed: true, action: () => { const n = freshDb(); replace(n); setF(n.settings); toast('All data cleared') } })}>Delete all data</button>
         </div>
         <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={onFile} />
       </div>
@@ -133,7 +133,7 @@ export default function Settings() {
           footer={<><button className="btn" onClick={() => { setConfirm(null); setTyped('') }}>Cancel</button>
             <button className="btn primary" disabled={confirm.typed && typed !== 'DELETE'} onClick={run}>Continue</button></>}>
           <p style={{ marginTop: 0 }}>{confirm.text}</p>
-          {confirm.typed && <Field label='Confirm panna "DELETE" nu type pannunga'><input value={typed} onChange={(e) => setTyped(e.target.value)} /></Field>}
+          {confirm.typed && <Field label='Type "DELETE" to confirm'><input value={typed} onChange={(e) => setTyped(e.target.value)} /></Field>}
         </Modal>
       )}
     </>

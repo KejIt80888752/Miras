@@ -27,7 +27,7 @@ export default function Reports() {
 
   return (
     <>
-      <Head title="Reports" sub="Selected period ku sales, purchase, profit">
+      <Head title="Reports" sub="Sales, purchases and profit for the selected period">
         <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
         <span className="sub">to</span>
         <input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
@@ -40,7 +40,7 @@ export default function Reports() {
       </div>
       <div className="card" style={{ marginTop: 14 }}>
         <h2>Product-wise sales</h2>
-        <p className="sub" style={{ margin: '-6px 0 10px' }}>Profit = sales (discount kazhichu, tax illama) − current cost price</p>
+        <p className="sub" style={{ margin: '-6px 0 10px' }}>Profit = sales (after discount, excluding tax) − current cost price</p>
         {rows.length ? (
           <div className="tw"><table>
             <thead><tr><th>Product</th><th>Category</th><th className="n">Qty sold</th><th className="n">Sales</th><th className="n">Cost</th><th className="n">Profit</th></tr></thead>
@@ -48,7 +48,7 @@ export default function Reports() {
               <tr key={r.name}><td>{r.name}</td><td>{r.cat}</td><td className="n">{qtyFmt(r.qty)}</td><td className="n">{money(r.rev)}</td><td className="n">{money(r.cost)}</td><td className="n"><b>{money(r.rev - r.cost)}</b></td></tr>
             ))}</tbody>
           </table></div>
-        ) : <div className="empty">Indha period la sales illa</div>}
+        ) : <div className="empty">No sales in this period</div>}
       </div>
       {adj.length > 0 && (
         <div className="card" style={{ marginTop: 14 }}>

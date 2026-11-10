@@ -31,7 +31,7 @@ export default function Dashboard() {
       </Head>
       {empty && (
         <div className="card" style={{ marginBottom: 14 }}>
-          <b>Welcome to Miras Carpets!</b> <span className="sub">Products add panni start pannunga, illa demo data load panni paarunga.</span>
+          <b>Welcome to Miras Carpets!</b> <span className="sub">Add your products to get started, or load demo data to explore.</span>
           <div className="toolbar" style={{ margin: '10px 0 0' }}>
             <a className="btn primary" href="#/inventory">Add first product</a>
             <button className="btn" onClick={() => { replace(sampleDb()); toast('Demo data loaded') }}>Load demo data</button>
@@ -81,12 +81,12 @@ export default function Dashboard() {
                 <tr key={p.id}><td><span className="cat-name"><Icon name={(CATALOG[p.category] || CATALOG.Other).icon} style={{ color: 'var(--muted)' }} />{p.name}</span></td><td className="n">{qtyFmt(p.qty)} {p.unit}</td><td><StockBadge p={p} /></td></tr>
               ))}
             </tbody></table></div>
-          ) : <div className="empty"><Icon name="check" size={22} style={{ color: 'var(--ok)', display: 'block', margin: '0 auto 6px' }} />Ellaa products-um stock la irukku</div>}
+          ) : <div className="empty"><Icon name="check" size={22} style={{ color: 'var(--ok)', display: 'block', margin: '0 auto 6px' }} />All products are well stocked</div>}
         </div>
       </div>
       <div className="card" style={{ marginTop: 14 }}>
         <h2>Recent bills</h2>
-        {recent.length ? <BillTable list={recent} onView={setView} /> : <div className="empty">Innum bills illa</div>}
+        {recent.length ? <BillTable list={recent} onView={setView} /> : <div className="empty">No bills yet</div>}
       </div>
       {view && <InvoiceModal bill={view} onClose={() => setView(null)} />}
     </>

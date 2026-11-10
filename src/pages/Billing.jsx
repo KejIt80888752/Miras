@@ -30,12 +30,12 @@ export default function Billing() {
 
   const save = () => {
     const items = bill.items.filter((it) => it.pid && num(it.qty) > 0)
-    if (!items.length) return toast('Kuraindhadhu oru product + qty venum', true)
-    if (!bill.date) return toast('Date select pannunga', true)
+    if (!items.length) return toast('Add at least one product with a quantity', true)
+    if (!bill.date) return toast('Please select a date', true)
     if (isOut) {
       const need = {}
       items.forEach((it) => (need[it.pid] = (need[it.pid] || 0) + num(it.qty)))
-      for (const pid in need) { const p = prod(pid); if (need[pid] > num(p.qty) + 1e-9) return toast(`"${p.name}" stock pathala (irukkuradhu ${qtyFmt(p.qty)})`, true) }
+      for (const pid in need) { const p = prod(pid); if (need[pid] > num(p.qty) + 1e-9) return toast(`"${p.name}" has only ${qtyFmt(p.qty)} in stock`, true) }
     }
     const d = structuredClone(db)
     {
@@ -59,11 +59,11 @@ export default function Billing() {
 
   return (
     <>
-      <Head title={isOut ? 'New Sale' : 'New Purchase'} sub={isOut ? 'Customer ku vikkura bill — stock kuraiyum' : 'Supplier kitta vaangura bill — stock koodum'}>
+      <Head title={isOut ? 'New Sale' : 'New Purchase'} sub={isOut ? 'Sales bill for a customer — stock will be reduced' : 'Purchase bill from a supplier — stock will be added'}>
         <Seg value={bill.type} options={[['out', 'Sale'], ['in', 'Purchase']]} onChange={switchType} />
       </Head>
       {!db.products.length ? (
-        <div className="card empty">Mudhalla products add pannunga. <a href="#/inventory">Products page →</a></div>
+        <div className="card empty">Please add products first. <a href="#/inventory">Products page →</a></div>
       ) : (
         <div className="card">
           <div className="form" style={{ gridTemplateColumns: '2fr 1fr' }}>
