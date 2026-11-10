@@ -19,14 +19,23 @@ const ICONS = {
 }
 
 const PAGES = [
-  ['dashboard', 'Dashboard', Dashboard],
-  ['products', 'Products', Products],
-  ['billing', 'Sale / Purchase', Billing],
+  ['dashboard', 'Dashboard', Dashboard, 'Overview'],
+  ['products', 'Products & Stock', Products, 'Inventory'],
+  ['billing', 'Sale / Purchase', Billing, 'Sales'],
   ['history', 'Bills History', History],
   ['parties', 'Customers & Suppliers', Parties],
-  ['reports', 'Reports', Reports],
+  ['reports', 'Reports', Reports, 'Insights'],
   ['settings', 'Settings', Settings],
 ]
+
+const LOGO = import.meta.env.BASE_URL + 'the-raise-logo.png'
+const Powered = ({ className }) => (
+  <div className={className}>
+    <div className="pl">POWERED BY</div>
+    <img src={LOGO} alt="The Raise" />
+    <div className="co">KEJ IT Solutions</div>
+  </div>
+)
 
 const getPage = () => { const h = location.hash.slice(1); return PAGES.some((p) => p[0] === h) ? h : 'dashboard' }
 
@@ -52,21 +61,34 @@ export default function App() {
   return (
     <div className="app">
       <aside>
-        <div className="brand"><div className="logo">M</div><div><b>Miras Carpets</b><small>Carpets · Shawls · Jewels</small></div></div>
+        <a className="brand" href="#dashboard" style={{ textDecoration: 'none' }}>
+          <div className="emblem">M</div>
+          <div><b>{db.settings.bizName || 'Miras Carpets'}</b><small>Carpets · Shawls · Jewels</small></div>
+        </a>
         <nav>
-          {PAGES.map(([k, l]) => (
-            <a key={k} href={'#' + k} className={k === page ? 'active' : ''} title={l}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={ICONS[k]} /></svg>
-              <span>{l}</span>
-            </a>
+          {PAGES.map(([k, l, , group]) => (
+            <div key={k} style={{ display: 'contents' }}>
+              {group && <div className="nav-label">{group}</div>}
+              <a href={'#' + k} className={k === page ? 'active' : ''} title={l}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={ICONS[k]} /></svg>
+                <span>{l}</span>
+              </a>
+            </div>
           ))}
         </nav>
         <div className="side-foot">
-          <div>{db.settings.bizName}</div>
-          <button className="btn sm theme-btn" onClick={toggleTheme}>◐ Theme</button>
+          <div className="side-user">
+            <div className="avatar">A</div>
+            <div><b>Admin</b><span>{db.settings.bizName}</span></div>
+            <button className="btn sm icon theme-btn" onClick={toggleTheme} title="Light / Dark theme">◐</button>
+          </div>
+          <Powered className="powered" />
         </div>
       </aside>
-      <main><Page key={page} /></main>
+      <main>
+        <Page key={page} />
+        <Powered className="powered-mobile" />
+      </main>
     </div>
   )
 }

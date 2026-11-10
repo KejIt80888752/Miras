@@ -38,19 +38,20 @@ export default function Dashboard() {
         </div>
       )}
       <div className="grid kpis">
-        <Kpi l="Total Products" v={db.products.length} />
-        <Kpi l="Stock Value (cost)" v={money(stockVal)} />
-        <Kpi l="Low / Out of Stock" v={lowList.length} warn={lowList.length > 0} />
-        <Kpi l="Today's Sales" v={money(sum('out', (b) => b.date === today()))} />
-        <Kpi l="Sales this month" v={money(sum('out', (b) => b.date.startsWith(mon)))} />
-        <Kpi l="Purchases this month" v={money(sum('in', (b) => b.date.startsWith(mon)))} />
+        <Kpi l="Total Products" v={db.products.length} ic="box" c="c1" />
+        <Kpi l="Stock Value (cost)" v={money(stockVal)} ic="value" c="c2" />
+        <Kpi l="Low / Out of Stock" v={lowList.length} warn={lowList.length > 0} ic="alert" c="c3" />
+        <Kpi l="Today's Sales" v={money(sum('out', (b) => b.date === today()))} ic="today" c="c4" />
+        <Kpi l="Sales this month" v={money(sum('out', (b) => b.date.startsWith(mon)))} ic="up" c="c1" />
+        <Kpi l="Purchases this month" v={money(sum('in', (b) => b.date.startsWith(mon)))} ic="cart" c="c5" />
       </div>
       <div className="grid kpis" style={{ marginTop: 14 }}>
         {CATEGORY_NAMES.filter((c) => c !== 'Other' || db.products.some((p) => p.category === 'Other')).map((c) => {
           const ps = db.products.filter((p) => p.category === c)
           return (
-            <a key={c} href="#products" className="card kpi" style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div className="l">{CATALOG[c].icon} {c}</div>
+            <a key={c} href="#products" className="card kpi cat-card">
+              <div className="ic c2"><span className="emo" style={{ fontSize: 20 }}>{CATALOG[c].icon}</span></div>
+              <div className="l">{c}</div>
               <div className="v">{qtyFmt(ps.reduce((s, p) => s + num(p.qty), 0))} <span className="sub" style={{ fontSize: 13, fontWeight: 400 }}>in stock · {ps.length} items</span></div>
               <div className="sub" style={{ fontSize: 12 }}>Value {money(ps.reduce((s, p) => s + num(p.qty) * num(p.cost), 0))}</div>
             </a>
@@ -91,6 +92,17 @@ export default function Dashboard() {
   )
 }
 
-const Kpi = ({ l, v, warn }) => (
-  <div className="card kpi"><div className="l">{l}</div><div className={'v' + (warn ? ' warn' : '')}>{v}</div></div>
+const IC = {
+  box: 'M21 8 12 3 3 8v8l9 5 9-5zM12 12 3 8m9 4 9-4m-9 4v9',
+  value: 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6',
+  alert: 'M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4m0 4h.01',
+  today: 'M3 4h18v18H3zM16 2v4M8 2v4M3 10h18',
+  up: 'M23 6l-9.5 9.5-5-5L1 18M17 6h6v6',
+  cart: 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0',
+}
+const Kpi = ({ l, v, warn, ic, c }) => (
+  <div className="card kpi">
+    <div className={'ic ' + c}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={IC[ic]} /></svg></div>
+    <div className="l">{l}</div><div className={'v' + (warn ? ' warn' : '')}>{v}</div>
+  </div>
 )
